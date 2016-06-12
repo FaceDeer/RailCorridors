@@ -13,6 +13,8 @@ local way_max = 7;
 -- Probability for every horizontal part of a corridor to be without light
 local probability_torches_in_segment = 0.5
 
+local probability_rail_in_segment = 0.5
+
 -- Wahrsch. für jeden Teil eines Korridors, nach oben oder nach unten zu gehen
 -- Probability for every part of a corridor to go up or down
 local probability_up_or_down = 0.2
@@ -24,6 +26,11 @@ local propability_fork = 0.5
 -- Wahrscheinlichkeit für Kisten
 -- Probability for chests
 local probability_chest = 1/100
+
+local probability_water = 0.00085
+local probability_lava = 0.00015
+
+local probability_liquid = probability_lava + probability_water
 
 -- Spielerische Generation, braucht aber mehr Rechenleistung
 -- Fancy mode; deactivate if world generation too laggy
@@ -172,6 +179,7 @@ function corridor_part(point, direction, length, i_offset)
 		else torchdir = {1,1}
 		end
 	end
+	local place_rail = nextrandom(0,1) < probability_rail_in_segment
 	for i = 1+i_offset,length+i_offset+2 do
 		minetest.set_node(vector, node_air)
 		
@@ -183,9 +191,9 @@ function corridor_part(point, direction, length, i_offset)
 		-- Decke
 		FillNodesProbable({x=vector.x-direction.z, y=vector.y+1, z=vector.z-direction.x}, {x=vector.x+direction.z, y=vector.y+1, z=vector.z+direction.x}, 0.9, node_air)
 		if direction.y == 0 then
-			if nextrandom(0,2) < 1 then
+			if place_rail then
 				minetest.set_node({x=vector.x, y=vector.y-1, z=vector.z}, node_rails)
-			elseif nextrandom(1,10) > 1 then
+			else
 				minetest.set_node({x=vector.x, y=vector.y-1, z=vector.z}, node_air)
 			end
 			-- when there is no floor: maybe wood will make it!
@@ -204,9 +212,9 @@ function corridor_part(point, direction, length, i_offset)
 			elseif place_torches and (i % 5 == 4) then
 				minetest.set_node(vector, {name=name_torch,param2=torchdir[2]})
 			-- water or lava in the corridors?
-			elseif vector.y < 0 and nextrandom(0,1) < 0.001 then
+			elseif vector.y < 0 and nextrandom(0,1) < probability_liquid then
 				local cnode
-				if nextrandom(0,02) < 0.3 then
+				if nextrandom(0,1) < probability_lava / probability_liquid  then
 					cnode = node_lava
 				else
 					cnode = node_water
