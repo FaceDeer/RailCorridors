@@ -6,8 +6,8 @@ local probability_railcaves_in_chunk = 2/3
 
 -- Innerhalb welcher Parameter soll sich die Pfadlänge bewegen?
 -- Minimal and maximal value of path length
-local way_min = 4;
-local way_max = 7;
+local way_min = 5;
+local way_max = 15;
 
 -- Wahrsch. für jeden geraden Teil eines Korridors, keine Fackeln zu bekommen
 -- Probability for every horizontal part of a corridor to be without light
@@ -209,8 +209,8 @@ function corridor_part(point, direction, length, i_offset)
 			-- torches
 			elseif place_torches and (i % 5 == 1) and (i > 1+i_offset) then
 				minetest.set_node(vector, {name=name_torch,param2=torchdir[1]})
-			elseif place_torches and (i % 5 == 4) then
-				minetest.set_node(vector, {name=name_torch,param2=torchdir[2]})
+--			elseif place_torches and (i % 5 == 4) then
+--				minetest.set_node(vector, {name=name_torch,param2=torchdir[2]})
 			-- water or lava in the corridors?
 			elseif vector.y < 0 and nextrandom(0,1) < probability_liquid then
 				local cnode
